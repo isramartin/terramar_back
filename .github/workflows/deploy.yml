@@ -1,0 +1,30 @@
+name: Deploy Appwrite Function
+
+on:
+  push:
+    branches:
+      - main  # Asegúrate de que este sea el nombre de la rama principal de tu repositorio
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # El sistema operativo donde se ejecutará el trabajo
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'  # Usa la versión de Node.js que prefieras
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Appwrite CLI
+        run: curl -s https://appwrite.io/installer | bash
+
+      - name: Deploy to Appwrite
+        run: |
+          appwrite login --api-key ${{ secrets.APPWRITE_API_KEY }}  # Usa tu API Key de Appwrite
+          appwrite functions update --function-id <terramar_back> --zip ./my-function.zip
