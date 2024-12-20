@@ -19,5 +19,10 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "exclude": [
+    "test",
+    "node_modules",   // Excluir la carpeta node_modules
+    "dist"  
+  ]
 }
