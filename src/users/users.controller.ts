@@ -1,17 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Param,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from './user.interfice/user.interface';
+import { createuser } from './dto/createUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -20,12 +23,7 @@ export class UsersController {
   @Post('create')
   async saveUser(
     @Body()
-    userData: {
-      name: string;
-      email: string;
-      password: string;
-      age?: number;
-    },
+    userData: createuser
   ): Promise<{ message: string }> {
     try {
       // Llamamos al UserService para guardar el usuario
@@ -62,6 +60,29 @@ export class UsersController {
         'Failed to fetch users',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  @Put('update/:id')
+  async updateUser(
+    @Param('id') id: string, // El ID del documento que deseas actualizar
+    @Body() data: any // Los nuevos datos que deseas actualizar
+  ) {
+    try {
+      await this.userService.updateUser(id, data); // Llamada al servicio para actualizar el documento
+      return { message: 'User updated successfully' };
+    } catch (error) {
+      throw new HttpException('Failed to update user', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Delete('delte/:id')
+  async deleteUser(@Param('id') id: string) {
+    try {
+      await this.userService.deleteUser(id);
+      return { message: 'User deleted successfully' };
+    } catch (error) {
+      throw new HttpException('Failed to delete user', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

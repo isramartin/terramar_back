@@ -117,10 +117,63 @@ export class AppwriteService {
     }
   }
   
+  async updateData<T>(
+    documentId: string,
+    data: T,
+    collectionName: string,
+  ): Promise<void> {
+    const collectionMapping: Record<string, string> = {
+      users: config.userCollectionId, // Reemplaza con el verdadero ID de la colección
+      perfil: 'perfilCollectionId', // Reemplaza con el verdadero ID de la colección
+      productos: 'productosCollectionId', // Reemplaza con el verdadero ID de la colección
+    };
+
+    const collectionId = collectionMapping[collectionName];
+
+    if (!collectionId) {
+      throw new Error(`Collection name "${collectionName}" is not valid.`);
+    }
+
+    try {
+      const response = await this.database.updateDocument(
+        this.databaseId, // Tu ID de base de datos desde appwrite.json
+        collectionId, // El ID de la colección correspondiente
+        documentId, // ID del documento que deseas actualizar
+        data, // Nuevos datos para actualizar
+      );
+
+      console.log('Document updated successfully:', response);
+    } catch (error) {
+      console.error('Error updating document:', error);
+      throw error;
+    }
+  }
   
+  async deleteData(documentId: string, collectionName: string): Promise<void> {
+    const collectionMapping: Record<string, string> = {
+      users: config.userCollectionId, // Reemplaza con el ID real de la colección de usuarios
+      perfil: 'perfilCollectionId', // Reemplaza con el ID real de la colección de perfiles
+      productos: 'productosCollectionId', // Reemplaza con el ID real de la colección de productos
+    };
   
+    const collectionId = collectionMapping[collectionName];
   
+    if (!collectionId) {
+      throw new Error(`Collection name "${collectionName}" is not valid.`);
+    }
   
+    try {
+      const response = await this.database.deleteDocument(
+        this.databaseId, 
+        collectionId, 
+        documentId,
+      );
+      console.log('Document deleted successfully:', response);
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      throw error;
+    }
+  }
   
 
   async uploadFile(

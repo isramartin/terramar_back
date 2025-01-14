@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { AppwriteService } from 'src/appwrite/appwrite.service';
 import { User } from './user.interfice/user.interface';
+import { createuser } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/UpdateUser.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly appwriteService: AppwriteService) {}
 
-  async createUser(userData: {
-    name: string;
-    email: string;
-    password: string;
-    age?: number;
-  }): Promise<void> {
+  async createUser(userData:createuser): Promise<void> {
     try {
 
      const collectionName = 'users';
@@ -44,6 +41,26 @@ export class UsersService {
       return users;
     } catch (error) {
       throw new Error('Error fetching users');
+    }
+  }
+
+  async updateUser(id: string, userData: UpdateUserDto): Promise<void> {
+    try {
+      const collectionName = 'users';
+      await this.appwriteService.updateData(id, userData, collectionName);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      const collectionName = 'users';
+      await this.appwriteService.deleteData(userId, collectionName);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
     }
   }
   
