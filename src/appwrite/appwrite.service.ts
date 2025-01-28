@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Client, Databases, Storage, AppwriteException } from 'appwrite';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,36 +29,36 @@ export class AppwriteService {
     this.databaseId = config.databaseId;
   }
 
-  async saveData<T>(data: T, collectionName: string): Promise<void> {
-    
-    const documentId = uuidv4();
+ async saveData<T>(data: T, collectionName: string): Promise<void> {
+  const documentId = uuidv4();
 
-    const collectionMapping: Record<string, string> = {
-      users: config.userCollectionId,
-      perfil: 'perfilCollectionId', // Reemplaza con el verdadero ID de la colección
-      productos: 'productosCollectionId', // Reemplaza con el verdadero ID de la colección
-    };
+  const collectionMapping: Record<string, string> = {
+    users: config.userCollectionId,
+    perfil: 'perfilCollectionId',
+    productos: 'productosCollectionId',
+  };
 
-    const collectionId = collectionMapping[collectionName];
+  const collectionId = collectionMapping[collectionName];
 
-    if (!collectionId) {
-      throw new Error(`Collection name "${collectionName}" is not valid.`);
-    }
-
-    try {
-      const response = await this.database.createDocument(
-        this.databaseId, // Usar el databaseId desde appwrite.json
-        collectionId, // Usar el collectionId desde appwrite.json
-        documentId,
-        data,
-      );
-
-      console.log('Document created successfully:', response);
-    } catch (error) {
-      console.error('Error creating document:', error);
-      throw error;
-    }
+  if (!collectionId) {
+    // Lanza un error si el nombre de la colección no es válido
+    throw new HttpException(`Collection "${collectionName}" is not valid.`, HttpStatus.BAD_REQUEST);
   }
+
+  try {
+    await this.database.createDocument(
+      this.databaseId,
+      collectionId,
+      documentId,
+      data,
+    );
+  } catch (error) {
+    // Aquí no lanzamos el error, solo lo pasamos al catch del servicio
+    console.error('Error creating document:', error);
+    throw error; // Propagamos el error para que lo maneje el servicio
+  }
+}
+
 
   async getData<T>(collectionName: string, documentId: string): Promise<T | null> {
     // Mapeo de las colecciones con sus respectivos IDs

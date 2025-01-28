@@ -21,18 +21,9 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post('create')
-  async saveUser(
-    @Body()
-    userData: createuser
-  ): Promise<{ message: string }> {
-    try {
-      // Llamamos al UserService para guardar el usuario
-      await this.userService.createUser(userData);
-      return { message: 'User saved successfully' };
-    } catch (error) {
-      return { message: 'Error saving user' };
-    }
-  }
+async saveUser(@Body() userData: createuser): Promise<void> {
+  return this.userService.createUser(userData);
+}
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string): Promise<User | null> {
@@ -105,3 +96,7 @@ export class UsersController {
     }
   }
 }
+function errorResponse(arg0: { key: string; type: string; message: any; }[]) {
+  throw new Error('Function not implemented.');
+}
+

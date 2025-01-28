@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { GlobalExceptionFilter } from './utils/global-exception-filter';
+import { CustomValidationPipe } from './utils/ValidationPipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +15,10 @@ async function bootstrap() {
       transform: true, // Transforma los datos automáticamente
     }),
   );
-  
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  // // app.useGlobalFilters(errorsResponse)
+  // app.useGlobalPipes(new CustomValidationPipe());
+
   await app.listen(3001);
 }
 bootstrap();
