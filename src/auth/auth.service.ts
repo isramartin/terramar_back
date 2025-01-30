@@ -6,6 +6,7 @@ import { errorsResponse } from 'src/utils/errorResponse';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { AppwriteService } from 'src/appwrite/appwrite.service';
+import { Users } from 'node-appwrite';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,8 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     
     const user = await this.usersService.findByEmail(loginDto.email);
+    console.log("user", user)
+    // const roleId = await this.usersService.getRoleById(loginDto.e);
 
     if (!user) {
       return errorsResponse([
@@ -44,7 +47,7 @@ export class AuthService {
       ]);
     }
 
-    const roles = await this.usersService.getRoleById("679a8dba001af7b470be");
+    const roles = await this.usersService.getRoleById(user.Id_rol);
     console.log("roles", roles)
     console.log('Permisos del rol:', roles?.permissions);
 

@@ -33,7 +33,7 @@ export class RolesPermissionsGuard implements CanActivate {
     if (requiredRoles && requiredRoles.length > 0) {
       if (!requiredRoles.includes(user.roles)) {
         throw new ForbiddenException(
-          `Requiere uno de los siguientes roles: ${requiredRoles.join(', ')}`,
+          `acceso denagado :: Requiere uno de los siguientes roles: ${requiredRoles.join(', ')}`,
         );
       }
     }

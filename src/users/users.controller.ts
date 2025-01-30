@@ -28,7 +28,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post('create')
-  @Roles('admin_level_1')
+  @Roles('admin_level_3')
   @Permissions('create', "read")
   @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   // @Roles(RolesEnum.ADMIN_LEVEL_1)
@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   @Put('update/:id')
-  @Roles('admin_level_1')
+  @Roles('admin_level_2')
   @Permissions('update')
   @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   async updateUser(
