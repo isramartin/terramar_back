@@ -9,23 +9,38 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from './user.interfice/user.interface';
 import { createuser } from './dto/createUser.dto';
+import { Permissions, Roles } from 'src/decorators/roles.decorator';
+import { RolesPermissionsGuard } from 'src/guards/roles-permissions.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { Roles as RolesEnum, Permissions as PermissionsEnum} from '../constants/roles-permission';
+import { read } from 'fs';
 
 @Controller('users')
+
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post('create')
-async saveUser(@Body() userData: createuser): Promise<void> {
-  return this.userService.createUser(userData);
-}
+  @Roles('admin_level_1')
+  @Permissions('create', "read")
+  @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
+  // @Roles(RolesEnum.ADMIN_LEVEL_1)
+  // @Permissions(PermissionsEnum.CREATE, PermissionsEnum.READ)
+  async saveUser(@Body() userData: createuser): Promise<void> {
+    return this.userService.createUser(userData);
+  }
 
   @Get(':userId')
+  @Roles('admin_level_3')
+  @Permissions('create', "read")
+  @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   async getUser(@Param('userId') userId: string): Promise<User | null> {
     try {
       const user = await this.userService.getUserData(userId);
@@ -55,15 +70,21 @@ async saveUser(@Body() userData: createuser): Promise<void> {
   }
 
   @Put('update/:id')
+  @Roles('admin_level_1')
+  @Permissions('update')
+  @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   async updateUser(
     @Param('id') id: string, // El ID del documento que deseas actualizar
-    @Body() data: any // Los nuevos datos que deseas actualizar
+    @Body() data: any, // Los nuevos datos que deseas actualizar
   ) {
     try {
       await this.userService.updateUser(id, data); // Llamada al servicio para actualizar el documento
       return { message: 'User updated successfully' };
     } catch (error) {
-      throw new HttpException('Failed to update user', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to update user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -73,7 +94,10 @@ async saveUser(@Body() userData: createuser): Promise<void> {
       await this.userService.deleteUser(id);
       return { message: 'User deleted successfully' };
     } catch (error) {
-      throw new HttpException('Failed to delete user', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to delete user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -96,7 +120,6 @@ async saveUser(@Body() userData: createuser): Promise<void> {
     }
   }
 }
-function errorResponse(arg0: { key: string; type: string; message: any; }[]) {
+function errorResponse(arg0: { key: string; type: string; message: any }[]) {
   throw new Error('Function not implemented.');
 }
-

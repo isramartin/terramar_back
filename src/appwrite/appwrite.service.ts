@@ -29,13 +29,14 @@ export class AppwriteService {
     this.databaseId = config.databaseId;
   }
 
- async saveData<T>(data: T, collectionName: string): Promise<void> {
+ async saveData<T>(data: T, collectionName: string): Promise<T & { documentId: string }> {
   const documentId = uuidv4();
 
   const collectionMapping: Record<string, string> = {
     users: config.userCollectionId,
     perfil: 'perfilCollectionId',
     productos: 'productosCollectionId',
+    roles: config.rolesCollectionId,
   };
 
   const collectionId = collectionMapping[collectionName];
@@ -46,12 +47,18 @@ export class AppwriteService {
   }
 
   try {
+
+    const metadata = { ...data, id: documentId };
+
     await this.database.createDocument(
       this.databaseId,
       collectionId,
       documentId,
-      data,
+      metadata,
     );
+
+    return { ...metadata, documentId };
+
   } catch (error) {
     // Aquí no lanzamos el error, solo lo pasamos al catch del servicio
     console.error('Error creating document:', error);
@@ -60,40 +67,45 @@ export class AppwriteService {
 }
 
 
-  async getData<T>(collectionName: string, documentId: string): Promise<T | null> {
-    // Mapeo de las colecciones con sus respectivos IDs
-    const collectionMapping: Record<string, string> = {
-      users: config.userCollectionId,
-      perfil: 'perfilCollectionId', // Reemplaza con el verdadero ID de la colección
-      productos: 'productosCollectionId', // Reemplaza con el verdadero ID de la colección
-    };
-  
-    const collectionId = collectionMapping[collectionName];
-  
-    if (!collectionId) {
-      throw new Error(`Collection name "${collectionName}" is not valid.`);
-    }
-  
-    try {
-      // Obtener el documento de la colección usando el ID del documento
-      const response = await this.database.getDocument(
-        this.databaseId, // Usar el databaseId desde appwrite.json
-        collectionId,    // Usar el collectionId obtenido del mapeo
-        documentId,      // El ID del documento a obtener
-      );
-  
-      console.log('Document retrieved successfully:', response);
-  
-      return response as T; // Retorna los datos del documento
-    } catch (error) {
-      console.error('Error retrieving document:', error);
-      throw error;
-    }
+async getData<T>(collectionName: string, documentId: string): Promise<T | null> {
+  console.log('Fetching document:', { collectionName, documentId }); // Depuración
+
+  const collectionMapping: Record<string, string> = {
+    users: config.userCollectionId,
+    roles: config.rolesCollectionId,
+  };
+
+  const collectionId = collectionMapping[collectionName];
+
+  if (!collectionId) {
+    throw new Error(`Collection name "${collectionName}" is not valid.`);
   }
+
+  console.log('Using collection ID:', collectionId); // Depuración
+
+  try {
+    const response = await this.database.getDocument(
+      this.databaseId,
+      collectionId,
+      documentId,
+    );
+
+    console.log('Document retrieved successfully:', response); // Depuración
+
+    return response as T;
+  } catch (error) {
+    console.error('Error retrieving document:', error); // Depuración
+    if (error.code === 404) {
+      throw new Error(`Document with ID "${documentId}" not found in collection "${collectionName}".`);
+    }
+    throw error;
+  }
+}
   
   async getAllData<T>(collectionName: string): Promise<T[]> {
     const collectionMapping: Record<string, string> = {
       users: config.userCollectionId,
+      roles: config.rolesCollectionId,
       // Otros mapeos de colecciones
     };
   
@@ -174,8 +186,22 @@ export class AppwriteService {
       throw error;
     }
   }
-  
 
+  // async  getRoleById(roleId: string) {
+  //   try {
+  //     const role = await this.database.getDocument(
+  //       this.databaseId, // Usar el databaseId desde appwrite.json
+  //       collectionId,    // Usar el collectionId obtenido del mapeo
+  //       documentId,      // El ID del documento a obtener
+  //     );
+  //     return role;
+  //   } catch (error) {
+  //     console.error('Error al obtener el rol:', error);
+  //     return null;
+  //   }
+  // }
+
+  
   async uploadFile(
     bucketName: string, 
     file: Express.Multer.File,

@@ -14,4 +14,7 @@ export class createuser {
 
  @IsNumber()
   age: number;
+
+  @IsString()
+  Id_rol: string
 }
