@@ -8,12 +8,8 @@ import { AppwriteService } from 'src/appwrite/appwrite.service';
 import { User } from './user.interfice/user.interface';
 import { createuser } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
-import { ErrorType } from 'src/utils/interface/errorTipe.interface';
-import { GlobalExceptionFilter } from 'src/utils/global-exception-filter';
 import { errorsResponse } from 'src/utils/errorResponse';
 import * as bcrypt from 'bcrypt';
-import { Users } from 'node-appwrite';
-import { promises } from 'dns';
 
 @Injectable()
 export class UsersService {
@@ -22,16 +18,16 @@ export class UsersService {
   async getRoleById(roleId: string): Promise<Roles | null> {
     try {
       console.log('Buscando rol con ID:', roleId); // Depuración
-  
+
       // Obtener el rol usando el servicio de Appwrite
       const role = await this.appwriteService.getData<Roles>('roles', roleId);
-  
+
       // Si no se encuentra el rol, devolver null
       if (!role) {
         console.log('Rol no encontrado'); // Depuración
         return null;
       }
-  
+
       console.log('Rol encontrado:', role);
       return role;
     } catch (error) {
@@ -42,7 +38,6 @@ export class UsersService {
 
   async getRole(id: string): Promise<any> {
     try {
-      
       const roles = await this.appwriteService.getAllData<Roles>('roles');
 
       return roles;
@@ -54,12 +49,13 @@ export class UsersService {
 
   async createUser(createUserDto: createuser): Promise<any> {
     const { email, password, Id_rol } = createUserDto;
-  
+
     try {
       // Verificar si el email ya está registrado
-      const existingUser: User[] = await this.appwriteService.getAllData('users');
+      const existingUser: User[] =
+        await this.appwriteService.getAllData('users');
       const existingEmails = existingUser.map((user) => user.email);
-  
+
       if (existingEmails.includes(email)) {
         return errorsResponse([
           {
@@ -69,10 +65,10 @@ export class UsersService {
           },
         ]);
       }
-  
+
       // 🔑 Hashear la contraseña antes de guardarla
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+
       // Obtener el rol correspondiente al Id_rol
       let role: Roles;
       try {
@@ -86,7 +82,7 @@ export class UsersService {
           },
         ]);
       }
-  
+
       // Preparar los datos del usuario con el rol y permisos asignados
       const userData = {
         ...createUserDto,
@@ -95,12 +91,12 @@ export class UsersService {
         // permisos: role.permissions, // Asignar los permisos del rol
         Id_rol: role.id, // Asignar el ID del rol (opcional)
       };
-  
+
       // Guardar datos en Appwrite
       const savedUser = await this.appwriteService.saveData(userData, 'users');
-  
+
       console.log('savedUser', savedUser);
-  
+
       return {
         code: HttpStatus.CREATED,
         success: true,

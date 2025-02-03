@@ -19,17 +19,14 @@ import { createuser } from './dto/createUser.dto';
 import { Permissions, Roles } from 'src/decorators/roles.decorator';
 import { RolesPermissionsGuard } from 'src/guards/roles-permissions.guard';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { Roles as RolesEnum, Permissions as PermissionsEnum} from '../constants/roles-permission';
-import { read } from 'fs';
 
 @Controller('users')
-
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post('create')
-  @Roles('admin_level_3')
-  @Permissions('create', "read")
+  @Roles('admin_level_2')
+  @Permissions('create', 'read')
   @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   // @Roles(RolesEnum.ADMIN_LEVEL_1)
   // @Permissions(PermissionsEnum.CREATE, PermissionsEnum.READ)
@@ -39,7 +36,7 @@ export class UsersController {
 
   @Get(':userId')
   @Roles('admin_level_3')
-  @Permissions('create', "read")
+  @Permissions('create', 'read')
   @UseGuards(JwtAuthGuard, RolesPermissionsGuard)
   async getUser(@Param('userId') userId: string): Promise<User | null> {
     try {

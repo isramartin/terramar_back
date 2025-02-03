@@ -7,6 +7,5 @@ import { AppwriteService } from 'src/appwrite/appwrite.service';
   controllers: [UsersController],
   providers: [UsersService, AppwriteService],
   exports: [UsersService],
-
 })
 export class UsersModule {}

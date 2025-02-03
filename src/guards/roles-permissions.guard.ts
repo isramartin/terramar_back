@@ -17,13 +17,13 @@ export class RolesPermissionsGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>('permissions', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      'permissions',
+      [context.getHandler(), context.getClass()],
+    );
 
     const { user } = context.switchToHttp().getRequest();
-    console.log("User.role:", user.roles);
+    console.log('User.role:', user.roles);
 
     if (!user) {
       throw new ForbiddenException('No autenticado');

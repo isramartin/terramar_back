@@ -1,9 +1,10 @@
 import { IsNumber, IsString, MaxLength } from 'class-validator';
 
 export class createuser {
-
   @IsString()
-  @MaxLength(15, { message: 'The name must be a string and no longer than 15 characters.' })
+  @MaxLength(15, {
+    message: 'The name must be a string and no longer than 15 characters.',
+  })
   name: string;
 
   @IsString()
@@ -12,9 +13,9 @@ export class createuser {
   @IsString()
   password: string;
 
- @IsNumber()
+  @IsNumber()
   age: number;
 
   @IsString()
-  Id_rol: string
+  Id_rol: string;
 }
