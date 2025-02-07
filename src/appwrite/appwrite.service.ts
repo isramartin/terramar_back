@@ -4,7 +4,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { Client, Databases, Storage, AppwriteException } from 'appwrite';
+import { Client, Databases, Storage } from 'appwrite';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import config from '../../appwrite.json';
@@ -39,7 +39,7 @@ export class AppwriteService {
     const collectionMapping: Record<string, string> = {
       users: config.userCollectionId,
       perfil: 'perfilCollectionId',
-      productos: 'productosCollectionId',
+      products: config.productsCollectionId,
       roles: config.rolesCollectionId,
     };
 
@@ -115,6 +115,7 @@ export class AppwriteService {
     const collectionMapping: Record<string, string> = {
       users: config.userCollectionId,
       roles: config.rolesCollectionId,
+      products: config.productsCollectionId,
       // Otros mapeos de colecciones
     };
 
@@ -172,9 +173,9 @@ export class AppwriteService {
 
   async deleteData(documentId: string, collectionName: string): Promise<void> {
     const collectionMapping: Record<string, string> = {
-      users: config.userCollectionId, // Reemplaza con el ID real de la colección de usuarios
-      perfil: 'perfilCollectionId', // Reemplaza con el ID real de la colección de perfiles
-      productos: 'productosCollectionId', // Reemplaza con el ID real de la colección de productos
+      users: config.userCollectionId,
+      perfil: 'perfilCollectionId',
+      productos: config.productsCollectionId,
     };
 
     const collectionId = collectionMapping[collectionName];

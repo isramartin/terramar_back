@@ -110,6 +110,7 @@ export class UsersController {
         file,
         fileName,
         mimeType,
+        'productos',
       );
       return { message: 'File uploaded successfully', data: response };
     } catch (error) {

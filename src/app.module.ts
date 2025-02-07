@@ -10,17 +10,22 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RolesPermissionsGuard } from './guards/roles-permissions.guard';
 import { AuthMiddleware } from './middleware/auth.middleware';
+import { ProductsController } from './products/products.controller';
+import { ProductsModule } from './products/products.module';
 
 @Module({
-  imports: [AppwriteModule, UsersModule, AuthModule,
+  imports: [
+    AppwriteModule,
+    UsersModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true, // Hace que ConfigModule esté disponible globalmente
     }),
     AuthModule,
+    ProductsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppwriteService,
-  ],
+  controllers: [AppController, ProductsController],
+  providers: [AppService, AppwriteService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

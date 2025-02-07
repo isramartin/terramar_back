@@ -180,7 +180,7 @@ export class UsersService {
     file: Express.Multer.File,
     fileName: string,
     mimeType: string,
-    bucketName = 'productos',
+    bucketName: string,
   ) {
     try {
       // Llamamos al método del servicio global para subir el archivo
